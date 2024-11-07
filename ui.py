@@ -1,27 +1,30 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import *
 from PIL import Image, ImageTk
+from player import MusicPlayer
+
+music_player = MusicPlayer()
 
 root = Tk()
 root.title("Spotify alla better")
-
-HEIGHT = root.winfo_screenheight()
-WIDTH = root.winfo_screenwidth()
-root.geometry(f'{WIDTH}x{HEIGHT}')
+root.state("zoomed")
+root.configure(bg = "black")
 
 original_pause = Image.open("Assets/Pause_button.png")
 
-target_width = 40
-aspect_ratio = original_pause.width / original_pause.height
+target_width_pause = 40
+aspect_ratio_pause = original_pause.width / original_pause.height
 
-new_width = target_width
-new_height = int(new_width / aspect_ratio)
+new_width = target_width_pause
+new_height = int(new_width / aspect_ratio_pause)
 resized_image = original_pause.resize((new_width, new_height), Image.LANCZOS)
 
 PAUSE_IMAGE = ImageTk.PhotoImage(resized_image)
-pause = tk.Button(root, bd = 1, cursor = "hand2", 
-                  image = PAUSE_IMAGE, borderwidth = 0, highlightthickness = 0)
-pause.place(x = 940, y = 930)
+pause = tk.Button(root, bd = 0, cursor = "hand2", 
+                  image = PAUSE_IMAGE, borderwidth = 0, 
+                  highlightthickness = 0, relief = "flat", activebackground= "black")
+pause.place(x = 940, y = 915)
 
 original_next = Image.open("Assets/Next_song_button.png")
 
@@ -33,9 +36,9 @@ new_next_height = int(new_next_width / aspect_ratio_next)
 resized_next = original_next.resize((new_next_width, new_next_height), Image.LANCZOS)
 
 NEXT_IMAGE = ImageTk.PhotoImage(resized_next)
-next = tk.Button(root, bd = 1, cursor = "hand2", image = NEXT_IMAGE, borderwidth = 0,
-    highlightthickness = 0)
-next.place(x = 1010, y = 935)
+next = tk.Button(root, bd = 0, cursor = "hand2", image = NEXT_IMAGE, borderwidth = 0,
+    highlightthickness = 0,  relief="flat", activebackground= "black")
+next.place(x = 1010, y = 920)
 
 original_previous = Image.open("Assets/Previous_song_button.png")
 
@@ -44,8 +47,34 @@ new_previous_height = int(new_previous_width / aspect_ratio_next)
 resized_previous = original_previous.resize((new_previous_width, new_previous_height), Image.LANCZOS)
 
 PREVIOUS_IMAGE = ImageTk.PhotoImage(resized_previous)
-previous = tk.Button(root, bd = 1, cursor = "hand2", image = PREVIOUS_IMAGE, borderwidth = 0, 
-    highlightthickness = 0)
-previous.place(x = 880, y = 935)
+previous = tk.Button(root, bd = 0, cursor = "hand2", image = PREVIOUS_IMAGE, borderwidth = 0, 
+    highlightthickness = 0,  relief="flat", activebackground= "black")
+previous.place(x = 880, y = 920)
+
+original_play = Image.open("Assets/play_button.png")
+
+aspect_ratio_play = original_play.width / original_play.height
+
+target_width_play = 50
+
+new_play_width = target_width_play
+new_play_height = int(new_play_width / aspect_ratio_play)
+resized_play = original_play.resize((new_play_width, new_play_height), Image.LANCZOS)
+
+PLAY_IMAGE = ImageTk.PhotoImage(resized_play)
+play = tk.Button(root, bd = 0, cursor = "hand2", image = PLAY_IMAGE, borderwidth = 0, highlightthickness = 0,
+                 relief = "flat", activebackground = "black")
+play.place(x = 935, y = 910)
+
+time_label = Label(root, text = "00:00", background = "black", height = 10, width = 25, 
+                    bd = 0, font = ("Arial", 10), relief = "flat", fg="gray")
+time_label.place(x = 510, y = 910)
+
+end_time_label = Label(root, text = "4:00", background = "black", height = 10, width = 25,
+                        bd = 0, font = ("Arial", 10), relief = "flat", fg = "gray")
+end_time_label.place(x = 1210, y = 910)
+
+length_slider = ttk.Scale(root, from_=0, to=120, orient = "horizontal", length = 655)
+length_slider.place(x = 635, y = 977)
 
 root.mainloop()
