@@ -5,94 +5,108 @@ from PIL import Image, ImageTk
 from player import MusicPlayer
 import os
 
-music_player = MusicPlayer()
+class GUI(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-DIRECTORY = r"D:\Pantelis\playlist"
-SONGS_LIST = [os.path.join(DIRECTORY, file) for file in os.listdir(DIRECTORY)]
-music_player.load_song(SONGS_LIST)
+        self.music_player = MusicPlayer()
+        self.DIRECTORY = r"D:\Pantelis\playlist"
+        self.SONGS_LIST = [os.path.join(self.DIRECTORY, file) for file in os.listdir(self.DIRECTORY)]
+        self.music_player.load_song(self.SONGS_LIST)
 
-root = Tk()
-root.title("Spotify alla better")
-root.state("zoomed")
-root.configure(bg = "black")
+        self.title("Spotify alla better")
+        self.state("zoomed")
+        self.configure(bg = "black")
 
-original_pause = Image.open("Assets/Pause_button.png")
+        self.setup_buttons()
+        self.setup_labels()
+        self.setup_slider()
 
-target_width_pause = 40
-aspect_ratio_pause = original_pause.width / original_pause.height
+        self.update_time()
+        self.update_scale()
+        self.autoplay_next()
 
-new_width = target_width_pause
-new_height = int(new_width / aspect_ratio_pause)
-resized_image = original_pause.resize((new_width, new_height), Image.LANCZOS)
+    def setup_buttons(self):
+        #Load pause button
+        original_pause = Image.open("Assets/Pause_button.png")
+        self.setup_button_image(original_pause, 40, 915, "pause", self.music_player.pause_song)
 
-PAUSE_IMAGE = ImageTk.PhotoImage(resized_image)
-pause = tk.Button(root, bd = 0, cursor = "hand2", 
-                  image = PAUSE_IMAGE, borderwidth = 0, 
-                  highlightthickness = 0, relief = "flat", activebackground= "black", command = music_player.pause_song)
-pause.place(x = 940, y = 850)
+        #Load next button
+        original_next = Image.open("Assets/Next_song_button.png")
+        self.setup_button_image(original_next, 30, 920, "next", self.music_player.next_song)
 
-original_next = Image.open("Assets/Next_song_button.png")
+        #Load previous button
+        original_previous = Image.open("Assets/Previous_song_button.png")
+        self.setup_button_image(original_previous, 30, 920, "previous", self.music_player.previous_song)
 
-target_width_next = 30
-aspect_ratio_next = original_next.width / original_next.height
+        #Load play button
+        original_play = Image.open("Assets/play_button.png")
+        self.setup_button_image(original_play, 50, 908, "play", self.music_player.play_song)
 
-new_next_width = target_width_next
-new_next_height = int(new_next_width / aspect_ratio_next)
-resized_next = original_next.resize((new_next_width, new_next_height), Image.LANCZOS)
 
-NEXT_IMAGE = ImageTk.PhotoImage(resized_next)
-next = tk.Button(root, bd = 0, cursor = "hand2", image = NEXT_IMAGE, borderwidth = 0,
-    highlightthickness = 0,  relief="flat", activebackground= "black", command = music_player.next_song)
-next.place(x = 1010, y = 920)
+    def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
+        #Load and resize the button images
+        aspect_ratio = original_image.width / original_image.height
+        new_width = target_width
+        new_height = int(new_width / aspect_ratio)
+        resized_image = original_image.resize((new_width, new_height), Image.LANCZOS)
+        button_image = ImageTk.PhotoImage(resized_image)
 
-original_previous = Image.open("Assets/Previous_song_button.png")
+        button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
+                        relief="flat", activebackground="black", command=command)
+        button.image = button_image
+        if button_name == "pause":
+            button.place(x=1007, y=y_pos)
+        elif button_name == "next":
+            button.place(x=1070, y=y_pos)
+        elif button_name == "previous":
+            button.place(x=880, y=y_pos)
+        elif button_name == "play":
+            button.place(x=935, y=y_pos)
 
-new_previous_width = target_width_next
-new_previous_height = int(new_previous_width / aspect_ratio_next)
-resized_previous = original_previous.resize((new_previous_width, new_previous_height), Image.LANCZOS)
+    def setup_labels(self):
+        # Label to show the song time
+        self.time_label = Label(self, text="0:00", background="black", height=10, width=25, bd=0,
+                                font=("Arial", 10), relief="flat", fg="gray")
+        self.time_label.place(x=510, y=910)
 
-PREVIOUS_IMAGE = ImageTk.PhotoImage(resized_previous)
-previous = tk.Button(root, bd = 0, cursor = "hand2", image = PREVIOUS_IMAGE, borderwidth = 0, 
-    highlightthickness = 0,  relief="flat", activebackground= "black", command = music_player.previous_song)
-previous.place(x = 880, y = 920)
+        # Label to show the end time of the song
+        self.end_time_label = Label(self, text="0:00", background="black", height=10, width=25, bd=0,
+                                    font=("Arial", 10), relief="flat", fg="gray")
+        self.end_time_label.place(x=1210, y=910)
 
-original_play = Image.open("Assets/play_button.png")
+    def setup_slider(self):
+        # Slider to control song position
+        START = 0
+        end = self.music_player.get_length_in_sec()
+        self.length_slider = ttk.Scale(self, from_=START, to=end, orient="horizontal", length=655)
+        self.length_slider.place(x=635, y=977)
 
-aspect_ratio_play = original_play.width / original_play.height
+    def update_time(self):
+        #Update the time of the song every second
+        if self.music_player.is_playing:
+            current_time = self.music_player.get_song_position()
+            self.time_label.config(text=current_time)
 
-target_width_play = 50
+        end_time = self.music_player.get_length()
+        self.end_time_label.config(text=end_time)
 
-new_play_width = target_width_play
-new_play_height = int(new_play_width / aspect_ratio_play)
-resized_play = original_play.resize((new_play_width, new_play_height), Image.LANCZOS)
+        # Recall update_time every second
+        self.after(1000, self.update_time)
 
-PLAY_IMAGE = ImageTk.PhotoImage(resized_play)
-play = tk.Button(root, bd = 0, cursor = "hand2", image = PLAY_IMAGE, borderwidth = 0, highlightthickness = 0,
-                 relief = "flat", activebackground = "black", command = music_player.play_song)
-play.place(x = 935, y = 910)
+    def update_scale(self):
+        #Update the slider position every second
+        if self.music_player.is_playing:
+            self.length_slider.set(self.music_player.get_song_position_sec())
+            self.length_slider.config(to=self.music_player.get_length_in_sec())
 
-def update_time():
-    if music_player.is_playing:
-        current_time = music_player.get_song_position()
-        end_time = music_player.get_length()
+        self.after(1000, self.update_scale)
 
-        time_label.config(text = current_time)
-        end_time_label.config(text = end_time)
-        
-    root.after(1000, update_time)
+    def autoplay_next(self):
+        #Autoplay next song 
+        current_time = self.music_player.get_song_position_sec()
+        end_time = self.music_player.get_length_in_sec()
+        if current_time == end_time:
+            self.music_player.next_song()
 
-time_label = Label(root, text = "0:00", background = "black", height = 10, width = 25, 
-                    bd = 0, font = ("Arial", 10), relief = "flat", fg="gray")
-time_label.place(x = 510, y = 910)
-
-end_time = music_player.get_length()
-end_time_label = Label(root, text = "0:00", background = "black", height = 10, width = 25,
-                        bd = 0, font = ("Arial", 10), relief = "flat", fg = "gray")
-end_time_label.place(x = 1210, y = 910)
-
-length_slider = ttk.Scale(root, from_=0, to=120, orient = "horizontal", length = 655)
-length_slider.place(x = 635, y = 977)
-
-update_time()
-
-root.mainloop()
+        self.after(1000, self.autoplay_next)

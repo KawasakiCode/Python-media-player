@@ -1,5 +1,4 @@
 import pygame
-import time
 
 pygame.mixer.init()
 
@@ -60,6 +59,10 @@ class MusicPlayer:
         seconds = seconds % 60
         return f"{minutes}:{seconds:02}"
     
+    def get_song_position_sec(self):
+        milliseconds = pygame.mixer.music.get_pos()
+        return milliseconds // 1000
+
     def set_position(self, position):
         pygame.mixer.music.play(start = position)
 
@@ -68,6 +71,9 @@ class MusicPlayer:
         seconds = self.song_length % 60
         return f"{minutes}:{seconds:02}"
     
+    def get_length_in_sec(self):
+        return self.song_length
+
     def set_song_length(self):
         sound = pygame.mixer.Sound(self.current_song)
         self.song_length = int(sound.get_length())
