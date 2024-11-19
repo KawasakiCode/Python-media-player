@@ -4,6 +4,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 from player import MusicPlayer
 import os
+import io
 
 class GUI(tk.Tk):
     def __init__(self):
@@ -22,6 +23,7 @@ class GUI(tk.Tk):
         self.setup_labels()
         self.setup_slider()
 
+        self.show_metadata()
         self.update_time()
         self.update_scale()
         self.autoplay_next()
@@ -75,6 +77,24 @@ class GUI(tk.Tk):
                                     font=("Arial", 10), relief="flat", fg="gray")
         self.end_time_label.place(x=1210, y=910)
 
+        #Labels to show metadata
+        self.title_label = Label(self, text = "Title", background = "black", font = ("Arial", 15), fg = "white", relief = "flat",
+                                 height = 10, width = 50, bd = 0, anchor = "nw")
+        self.title_label.place(x = 60, y = 890, height = 30, width = 300)
+
+        self.artist_label = Label(self, text = "Artist", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
+                                 height = 10, width = 50, bd = 0, anchor = "nw")
+        self.artist_label.place(x = 60, y = 923, height = 30, width = 300)
+        
+        self.album_label = Label(self, text = "Album", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
+                                 height = 10, width = 50, bd = 0, anchor = "nw")
+        self.album_label.place(x = 60, y = 950, height = 30, width = 300)
+
+        self.cover_label = Label(self, image = None, background = "black", fg = "gray", relief = "flat",
+                                 height = 50, width = 50, bd = 0, anchor = "nw")
+        self.cover_label.place(x = 400, y = 300, height = 100, width = 100)
+
+
     def setup_slider(self):
         # Slider to control song position
         START = 0
@@ -110,3 +130,19 @@ class GUI(tk.Tk):
             self.music_player.next_song()
 
         self.after(1000, self.autoplay_next)
+    
+    def show_metadata(self):
+        #Show the data of each song 
+        metadata = self.music_player.get_metadata()
+        self.title_label.config(text = metadata["Title"])
+        formatted_artist = metadata["Artist"].replace("/", ",")
+        self.artist_label.config(text = formatted_artist)
+        self.album_label.config(text = metadata["Album"])
+
+        '''image_data = metadata["Album_cover"].image_data
+        img = Image.open(io.BytesIO(image_data))
+        img = img.resize((100, 100))
+        image = ImageTk.PhotoImage(img)
+        self.cover_label.config(image = image)
+        '''
+        self.after(1000, self.show_metadata)

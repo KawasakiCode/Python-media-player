@@ -1,7 +1,9 @@
 import pygame
 import random
+import eyed3
 
 pygame.mixer.init()
+eyed3.log.setLevel("ERROR")
 
 class MusicPlayer:
     def __init__(self):
@@ -27,6 +29,18 @@ class MusicPlayer:
             self.shuffle_list.append(0)
         self.shuffle_list[index] = 1
     
+    def get_metadata(self):
+        if self.current_song is not None:
+            audio_file = eyed3.load(self.current_song)
+            metadata = {}
+            metadata.update([("Title", audio_file.tag.title), ("Artist", audio_file.tag.artist), ("Album", audio_file.tag.album)])
+            if audio_file.tag.images:
+                image = audio_file.tag.images[0]
+                with open("album_cover.jpg", "wb") as img_file:
+                    img_file.write(image.image_data)
+                    metadata.update({"Album_cover": image})
+            return metadata
+
     def play_song(self):
         if not self.is_playing:
             pygame.mixer.music.load(self.current_song)
