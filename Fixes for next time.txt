@@ -1,0 +1,4 @@
+1. Fix autoplay not working.
+2. Fix when change playlist is pressed the window is minimized.
+3. Fix shuffle and previous song bugs when playlist is small.
+4. Fix when changing playlist the already loaded song from the previous one plays

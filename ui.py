@@ -6,23 +6,24 @@ from player import MusicPlayer
 import os
 import io
 
-class GUI(tk.Tk):
-    def __init__(self):
-        super().__init__()
-
-        self.music_player = MusicPlayer()
-        self.DIRECTORY = r"D:\Pantelis\playlist"
-        self.SONGS_LIST = [os.path.join(self.DIRECTORY, file) for file in os.listdir(self.DIRECTORY)]
-        self.music_player.load_song(self.SONGS_LIST)
+#inherit from tk.Toplevel because this will always be a child window
+class GUI(tk.Toplevel):
+    def __init__(self, parent, music_player, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.parent = parent
+        #get the music player instance of the playlistselectui
+        self.music_player = music_player
 
         self.title("Spotify alla better")
         self.state("zoomed")
         self.configure(bg = "black")
 
+        #setup widgets
         self.setup_buttons()
         self.setup_labels()
         self.setup_slider()
 
+        #run functions that handle time lables, metadata, the scale widget and the play next song automatically
         self.show_metadata()
         self.update_time()
         self.update_scale()
@@ -45,6 +46,11 @@ class GUI(tk.Tk):
         original_play = Image.open("Assets/play_button.png")
         self.setup_button_image(original_play, 50, 908, "play", self.music_player.play_song)
 
+        select_playlist_button = tk.Button(self, text = "Change Playlist?", bd = 0, cursor = "hand2", borderwidth = 0,
+                                           highlightthickness = 0, relief = "flat", background = "black", fg = "white", 
+                                           font = ("Arial", 11), activebackground = "black", command = self.go_back_to_playlist)
+        select_playlist_button.place(x = 1750, y = 950)
+
 
     def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
         #Load and resize the button images
@@ -56,6 +62,7 @@ class GUI(tk.Tk):
 
         button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
                         relief="flat", activebackground="black", command=command)
+        #keep the image as an attribute so python garbage collector won't delete it
         button.image = button_image
         if button_name == "pause":
             button.place(x=1007, y=y_pos)
@@ -80,15 +87,15 @@ class GUI(tk.Tk):
         #Labels to show metadata
         self.title_label = Label(self, text = "Title", background = "black", font = ("Arial", 15), fg = "white", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.title_label.place(x = 60, y = 890, height = 30, width = 600)
+        self.title_label.place(x = 60, y = 890, height = 30, width = 650)
 
         self.artist_label = Label(self, text = "Artist", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.artist_label.place(x = 60, y = 923, height = 30, width = 600)
+        self.artist_label.place(x = 60, y = 923, height = 30, width = 650)
         
         self.album_label = Label(self, text = "Album", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.album_label.place(x = 60, y = 950, height = 30, width = 600)
+        self.album_label.place(x = 60, y = 950, height = 30, width = 650)
 
         self.cover_label = Label(self, image = None, background = "black", fg = "gray", relief = "flat",
                                  height = 50, width = 50, bd = 0, anchor = "nw")
@@ -139,6 +146,7 @@ class GUI(tk.Tk):
         self.artist_label.config(text = formatted_artist)
         self.album_label.config(text = metadata["Album"])
 
+        #get the image data convert it to an image object and open it
         image_data = metadata["Album_cover"]
         img = Image.open(io.BytesIO(image_data))
         img = img.resize((300, 300))
@@ -147,3 +155,8 @@ class GUI(tk.Tk):
         
 
         self.after(1000, self.show_metadata)
+    
+    def go_back_to_playlist(self):
+        #if the button change playlist is pressed destroy the window and show the parent window again
+        self.destroy()
+        self.parent.deiconify()

@@ -1,5 +1,5 @@
-from ui import GUI
+from playlistselectui import PlaylistSelectUI
 
 if __name__ == "__main__":
-    gui = GUI()
-    gui.mainloop()
+    playlistselect = PlaylistSelectUI()
+    playlistselect.mainloop()
