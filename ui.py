@@ -80,19 +80,19 @@ class GUI(tk.Tk):
         #Labels to show metadata
         self.title_label = Label(self, text = "Title", background = "black", font = ("Arial", 15), fg = "white", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.title_label.place(x = 60, y = 890, height = 30, width = 300)
+        self.title_label.place(x = 60, y = 890, height = 30, width = 600)
 
         self.artist_label = Label(self, text = "Artist", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.artist_label.place(x = 60, y = 923, height = 30, width = 300)
+        self.artist_label.place(x = 60, y = 923, height = 30, width = 600)
         
         self.album_label = Label(self, text = "Album", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
-        self.album_label.place(x = 60, y = 950, height = 30, width = 300)
+        self.album_label.place(x = 60, y = 950, height = 30, width = 600)
 
         self.cover_label = Label(self, image = None, background = "black", fg = "gray", relief = "flat",
                                  height = 50, width = 50, bd = 0, anchor = "nw")
-        self.cover_label.place(x = 400, y = 300, height = 100, width = 100)
+        self.cover_label.place(x = 810, y = 300, height = 300, width = 300)
 
 
     def setup_slider(self):
@@ -139,10 +139,11 @@ class GUI(tk.Tk):
         self.artist_label.config(text = formatted_artist)
         self.album_label.config(text = metadata["Album"])
 
-        '''image_data = metadata["Album_cover"].image_data
+        image_data = metadata["Album_cover"]
         img = Image.open(io.BytesIO(image_data))
-        img = img.resize((100, 100))
-        image = ImageTk.PhotoImage(img)
-        self.cover_label.config(image = image)
-        '''
+        img = img.resize((300, 300))
+        self.image = ImageTk.PhotoImage(img)
+        self.cover_label.config(image = self.image)
+        
+
         self.after(1000, self.show_metadata)

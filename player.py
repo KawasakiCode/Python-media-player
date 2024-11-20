@@ -36,9 +36,7 @@ class MusicPlayer:
             metadata.update([("Title", audio_file.tag.title), ("Artist", audio_file.tag.artist), ("Album", audio_file.tag.album)])
             if audio_file.tag.images:
                 image = audio_file.tag.images[0]
-                with open("album_cover.jpg", "wb") as img_file:
-                    img_file.write(image.image_data)
-                    metadata.update({"Album_cover": image})
+                metadata.update({"Album_cover": image.image_data})
             return metadata
 
     def play_song(self):
