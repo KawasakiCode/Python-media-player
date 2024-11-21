@@ -159,4 +159,7 @@ class GUI(tk.Toplevel):
     def go_back_to_playlist(self):
         #if the button change playlist is pressed destroy the window and show the parent window again
         self.destroy()
+        self.parent.state("zoomed")
+        self.music_player.pause_song()
+        self.music_player.is_playing = False
         self.parent.deiconify()

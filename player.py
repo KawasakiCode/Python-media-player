@@ -30,7 +30,7 @@ class MusicPlayer:
         #get song length for time labels in ui.py
         self.set_song_length()
         #fill the shuffle_list with as many 0 as the songs_list to handle the shuffle
-        for i in range(len(self.song_list) - 1):
+        for i in range(len(self.song_list)):
             self.shuffle_list.append(0)
         self.shuffle_list[index] = 1
     
@@ -77,15 +77,9 @@ class MusicPlayer:
                 break
             else:
                 #if it is not 0 then check if all shuffle list nodes are not zero meaning that all songs have been played
-                counter = 0
-                for i in range(len(self.song_list) - 1):
-                    if(self.shuffle_list != 0):
-                        counter += 1
-                    else: 
-                        break
+                if all(node != 0 for node in self.shuffle_list):
                     #if all songs have been played make shuffle list nodes all 0 again
-                if(counter == len(self.shuffle_list) - 1):
-                    for i in range(len(self.song_list) - 1):
+                    for i in range(len(self.shuffle_list)):
                         self.shuffle_list[i] = 0
                 #if the first random index was a song that has been played pick another one
                 next_index = random.randint(0, len(self.song_list) - 1)
