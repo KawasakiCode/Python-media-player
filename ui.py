@@ -13,6 +13,7 @@ class GUI(tk.Toplevel):
         self.parent = parent
         #get the music player instance of the playlistselectui
         self.music_player = music_player
+        self.protocol("WM_DELETE_WINDOW", self.close_all)
 
         self.title("Spotify alla better")
         self.state("zoomed")
@@ -23,16 +24,18 @@ class GUI(tk.Toplevel):
         self.setup_labels()
         self.setup_slider()
 
+        self.volume_slider.set(50)
         #run functions that handle time lables, metadata, the scale widget and the play next song automatically
         self.show_metadata()
         self.update_time()
         self.update_scale()
         self.autoplay_next()
+        self.update_volume()
 
     def setup_buttons(self):
         #Load pause button
         original_pause = Image.open("Assets/Pause_button.png")
-        self.setup_button_image(original_pause, 40, 915, "pause", self.music_player.pause_song)
+        self.setup_button_image(original_pause, 33, 919, "pause", self.music_player.pause_song)
 
         #Load next button
         original_next = Image.open("Assets/Next_song_button.png")
@@ -65,13 +68,13 @@ class GUI(tk.Toplevel):
         #keep the image as an attribute so python garbage collector won't delete it
         button.image = button_image
         if button_name == "pause":
-            button.place(x=1007, y=y_pos)
+            button.place(x=970, y=y_pos)
         elif button_name == "next":
-            button.place(x=1070, y=y_pos)
+            button.place(x=1020, y=y_pos)
         elif button_name == "previous":
-            button.place(x=880, y=y_pos)
+            button.place(x=870, y=y_pos)
         elif button_name == "play":
-            button.place(x=935, y=y_pos)
+            button.place(x=905, y=y_pos)
 
     def setup_labels(self):
         # Label to show the song time
@@ -101,6 +104,17 @@ class GUI(tk.Toplevel):
                                  height = 50, width = 50, bd = 0, anchor = "nw")
         self.cover_label.place(x = 810, y = 300, height = 300, width = 300)
 
+        #Volume label
+        original_image = Image.open("Assets/volume.png")
+        aspect_ratio = original_image.width / original_image.height
+        new_width = 30
+        new_height = int(new_width / aspect_ratio)
+        resized_image = original_image.resize((new_width, new_height), Image.LANCZOS)
+        self.volume_image = ImageTk.PhotoImage(resized_image)
+
+        self.volume_label = Label(self, image = self.volume_image, relief = "flat", bd = 0, background = "black")
+        self.volume_label.place(x = 1400, y = 976)
+
 
     def setup_slider(self):
         # Slider to control song position
@@ -108,6 +122,9 @@ class GUI(tk.Toplevel):
         end = self.music_player.get_length_in_sec()
         self.length_slider = ttk.Scale(self, from_=START, to=end, orient="horizontal", length=655)
         self.length_slider.place(x=635, y=977)
+
+        self.volume_slider = ttk.Scale(self, from_ = 0, to = 100, orient = "horizontal", length = 200)
+        self.volume_slider.place(x = 1450, y = 977)
 
     def update_time(self):
         #Update the time of the song every second
@@ -128,6 +145,14 @@ class GUI(tk.Toplevel):
             self.length_slider.config(to=self.music_player.get_length_in_sec())
 
         self.after(1000, self.update_scale)
+
+    def update_volume(self):
+        volume = self.volume_slider.get()
+        volume = volume / 100.0
+        self.music_player.change_volume(volume)
+
+        self.after(500, self.update_volume)
+
 
     def autoplay_next(self):
         #Autoplay next song 
@@ -163,3 +188,7 @@ class GUI(tk.Toplevel):
         self.music_player.pause_song()
         self.music_player.is_playing = False
         self.parent.deiconify()
+    
+    def close_all(self):
+        self.destroy()
+        self.quit()

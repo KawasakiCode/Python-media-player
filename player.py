@@ -165,3 +165,6 @@ class MusicPlayer:
         #set the total length of the song in seconds 
         sound = pygame.mixer.Sound(self.current_song)
         self.song_length = int(sound.get_length())
+
+    def change_volume(self, value):
+        pygame.mixer.music.set_volume(value)
