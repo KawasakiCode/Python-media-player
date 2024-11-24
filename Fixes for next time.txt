@@ -1,0 +1,5 @@
+2. Make a 3rd ui that let's the user create up to 5 playlists when the app runs
+    2.1 Make a button to handle the path and name entry not the enter key
+    2.2 When there is an error show labels instead of prints and return the user to the previous page to reenter info
+3. Give the user the ability to choose a specific song to play from the loaded playlist
+4. Give the user the ability to create a custom queue of songs from the loaded playlist

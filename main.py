@@ -1,5 +1,5 @@
-from playlistselectui import PlaylistSelectUI
+from playlist_maker import PlaylistMaker
 
 if __name__ == "__main__":
-    playlistselect = PlaylistSelectUI()
-    playlistselect.mainloop()
+    playlistmaker = PlaylistMaker()
+    playlistmaker.mainloop()
