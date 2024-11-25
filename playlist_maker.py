@@ -49,14 +49,12 @@ class PlaylistMaker(tk.Tk):
         self.name_label.place(x = 400, y = 450)
         #Names entry
         self.nameentry = Entry(width = 30)
-        self.nameentry.place(x = 400, y = 480)
-        #When enter is pressed enter paths and names
-        self.pathentry.bind("<Return>", self.get_path)
-        self.nameentry.bind("<Return>", self.get_name)        
-
-    #Function to check the input of the entry is it is a number
-    def is_input_number(self, char):
-        return char.isdigit() or char == ""
+        self.nameentry.place(x = 400, y = 480) 
+        #Button to handle the entries inputs
+        self.reput = Label(text = "", height = 1, bd = 0, bg = "black", fg = "gray", font = ("Arial", 10))
+        entry_button = Button(text = "Enter paths and names", bd = 0, background = "gray", fg = "white",
+                              highlightthickness = 0, relief = "flat", font = ("Arial", 10), command = lambda: self.process_entries_input(self.reput))
+        entry_button.place(x = 400, y = 550)      
     
     #Function that gets called when enter is pressed for entry
     def process_input(self, event = None):
@@ -74,30 +72,30 @@ class PlaylistMaker(tk.Tk):
             self.error_label.place(x = 400, y = 480)
             self.entry.delete(0, tk.END)
     
-    #Function that stores the paths in self
-    def get_path(self, event = None):
-        path = self.pathentry.get()
-        if not path:
-            print("Empty string inserted")
-        else: 
-            self.path = path
-    
-    #Function that sotres the names of the playlists in self
-    def get_name(self, event = None):
-        name = self.nameentry.get()
-        if not name:
-            print("Empty string inserted")
-        else: 
-            self.name = name
+    #Function that stores the paths and names in self
+    def process_entries_input(self, reput):
+        self.name = self.nameentry.get()
+        self.path = self.pathentry.get()
+        
+        reput.update_idletasks()
+        if not self.name and not self.path:
+            reput.config(text = "Dont' submit empty fields")
+        elif(not self.name):
+            reput.config(text = "Don't submit with empty name field")
+        elif(not self.path):
+            reput.config(text = "Don't submit with empty path field")
+        else:
             self.add_paths(self.path, self.name, self.user_input)
-    
+        reput.place(x = 400, y = 520)
+
     #Function to add the paths and call the playlist select ui 
     def add_paths(self, path, name, user_input):
         match int(user_input):
             case 1:
                 if os.path.exists(path):
                     if os.path.isdir(path):
-                        print("success")
+                        #TODO pass the path and name strings into the playlist manager
+                        pass
                     else:
                         print("There is no directory in this path")
                 else:
@@ -112,3 +110,7 @@ class PlaylistMaker(tk.Tk):
                 pass
             case _:
                 print("There was an error")
+    
+    #Function to check the input of the entry is it is a number
+    def is_input_number(self, char):
+        return char.isdigit() or char == ""

@@ -4,7 +4,8 @@ from player import MusicPlayer
 class PlaylistManager:
     def __init__(self):
         self.music_player = MusicPlayer()
-
+ 
+    #TODO make a dictionary with the names as keys and the paths as values
     def load_directory(self, playlist):
         #check which playlist to load 
         if(playlist == "playlist1"):

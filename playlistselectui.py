@@ -18,7 +18,8 @@ class PlaylistSelectUI(tk.Toplevel):
         self.setup_buttons()
         self.protocol("WM_DELETE_WINDOW", self.close_all)
 
-
+    #TODO pass name string and the user input then separate them correctly
+    #and make the playlists
     #set up button with lambda function to pass argument to load directory
     def setup_buttons(self):
         playlist1_button = Button(self, text = "Playlist 1", background = "black", activebackground = "black", 
