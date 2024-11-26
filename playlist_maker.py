@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 import os
+from playlist_manager import PlaylistManager
+from playlistselectui import PlaylistSelectUI
 
 class PlaylistMaker(tk.Tk):
     def __init__(self):
@@ -85,31 +87,16 @@ class PlaylistMaker(tk.Tk):
         elif(not self.path):
             reput.config(text = "Don't submit with empty path field")
         else:
-            self.add_paths(self.path, self.name, self.user_input)
+            self.add_paths(self.path, self.name)
         reput.place(x = 400, y = 520)
 
     #Function to add the paths and call the playlist select ui 
-    def add_paths(self, path, name, user_input):
-        match int(user_input):
-            case 1:
-                if os.path.exists(path):
-                    if os.path.isdir(path):
-                        #TODO pass the path and name strings into the playlist manager
-                        pass
-                    else:
-                        print("There is no directory in this path")
-                else:
-                    print("This is not a valid path")
-            case 2:
-                pass
-            case 3:
-                pass
-            case 4:
-                pass
-            case 5:
-                pass
-            case _:
-                print("There was an error")
+    def add_paths(self, path, name):
+        #Instantiate Playlist manager to check the paths and connect them to the correct names
+        self.playlistmanager = PlaylistManager(path, name, self.user_input)
+        self.withdraw()
+        #Call the playlist select gui
+        PlaylistSelectUI(self, self.user_input, self.name, self.playlistmanager)
     
     #Function to check the input of the entry is it is a number
     def is_input_number(self, char):
