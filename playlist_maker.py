@@ -1,9 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import *
 import os
 from playlist_manager import PlaylistManager
 from playlistselectui import PlaylistSelectUI
+import re
 
 class PlaylistMaker(tk.Tk):
     def __init__(self):
@@ -54,10 +54,14 @@ class PlaylistMaker(tk.Tk):
         self.nameentry.place(x = 400, y = 480) 
         #Button to handle the entries inputs
         self.reput = Label(text = "", height = 1, bd = 0, bg = "black", fg = "gray", font = ("Arial", 10))
+        self.patherror = Label(text = "", height = 1, bd = 0, bg = "black", fg = "gray", font = ("Arial", 10))
         entry_button = Button(text = "Enter paths and names", bd = 0, background = "gray", fg = "white",
-                              highlightthickness = 0, relief = "flat", font = ("Arial", 10), command = lambda: self.process_entries_input(self.reput))
-        entry_button.place(x = 400, y = 550)      
-    
+                              highlightthickness = 0, relief = "flat", font = ("Arial", 10), command = lambda: self.process_entries_input(self.reput, self.patherror))
+        entry_button.place(x = 400, y = 550)
+        go_back_button = Button(text = "Go back?", bd = 0, background = "gray", fg = "white",
+                              highlightthickness = 0, relief = "flat", font = ("Arial", 10), command = self.returnagain)      
+        go_back_button.place(x = 400, y = 580)
+
     #Function that gets called when enter is pressed for entry
     def process_input(self, event = None):
         self.user_input = self.entry.get()
@@ -75,11 +79,12 @@ class PlaylistMaker(tk.Tk):
             self.entry.delete(0, tk.END)
     
     #Function that stores the paths and names in self
-    def process_entries_input(self, reput):
+    def process_entries_input(self, reput, patherror):
         self.name = self.nameentry.get()
         self.path = self.pathentry.get()
         
         reput.update_idletasks()
+        patherror.update_idletasks()
         if not self.name and not self.path:
             reput.config(text = "Dont' submit empty fields")
         elif(not self.name):
@@ -87,7 +92,27 @@ class PlaylistMaker(tk.Tk):
         elif(not self.path):
             reput.config(text = "Don't submit with empty path field")
         else:
-            self.add_paths(self.path, self.name)
+            self.path = re.sub(r'\s*, \s*', ',', self.path)
+            self.name = re.sub(r'\s*, \s*', ',', self.name)
+            self.paths = self.path.split(",")
+            self.names = self.name.split(",")
+            for i in self.paths:
+                if(os.path.exists(i)):
+                    if(os.path.isdir(i)):
+                        if(int(self.user_input) == len(self.paths) and int(self.user_input) == len(self.names)):
+                            self.add_paths(self.path, self.name)
+                            break
+                        elif(int(self.user_input) != len(self.paths) and int(self.user_input) == len(self.names)):
+                            patherror.config(text = f"You inserted {len(self.paths)} paths while trying to create {self.user_input} playlists")
+                        elif(int(self.user_input) == len(self.paths) and int(self.user_input) != len(self.names)):
+                            patherror.config(text = f"You inserted {len(self.names)} names while trying to create {self.user_input} playlists")
+                        else:
+                            patherror.config(text = f"You inserted {len(self.paths)} paths and {len(self.names)} names while trying to create {self.user_input} playlists")
+                    else:
+                        patherror.config(text = f"Path no {self.paths.index(i)} is not a directory")
+                else:
+                        patherror.config(text = f"Path no {self.paths.index(i)} is not a valid path")
+        patherror.place(x = 400, y = 520)
         reput.place(x = 400, y = 520)
 
     #Function to add the paths and call the playlist select ui 
@@ -101,3 +126,7 @@ class PlaylistMaker(tk.Tk):
     #Function to check the input of the entry is it is a number
     def is_input_number(self, char):
         return char.isdigit() or char == ""
+
+    def returnagain(self):
+        self.destroy()
+        PlaylistMaker()

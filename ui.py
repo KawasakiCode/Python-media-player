@@ -3,8 +3,8 @@ from tkinter import ttk
 from tkinter import *
 from PIL import Image, ImageTk
 from player import MusicPlayer
-import os
 import io
+import os
 
 #inherit from tk.Toplevel because this will always be a child window
 class GUI(tk.Toplevel):
@@ -53,6 +53,14 @@ class GUI(tk.Toplevel):
                                            highlightthickness = 0, relief = "flat", background = "black", fg = "white", 
                                            font = ("Arial", 11), activebackground = "black", command = self.go_back_to_playlist)
         select_playlist_button.place(x = 1750, y = 950)
+
+        select_label = Label(text = "Search for a song", font = ("Arial", 11))
+        select_label.place(x = 100, y = 60)
+        self.select_song = Entry(self, font = ("Arial", 12))
+        self.select_song.place(x = 100, y = 80)
+        self.select_song_listbox = Listbox(self, font = ("Arial", 11), height = 5)
+        self.select_song.bind("<KeyRelease>", self.on_keypress)
+        self.select_song_listbox.bind("<Double-1>", self.play_song)
 
 
     def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
@@ -188,7 +196,38 @@ class GUI(tk.Toplevel):
         self.music_player.pause_song()
         self.music_player.is_playing = False
         self.parent.deiconify()
-    
+
+    #Function that triggers when a character is inserted into the search entry
+    def on_keypress(self, event):
+        #Get the string from the entry
+        search = self.select_song.get().strip()
+        #Clear the listbox from previous searches
+        self.select_song_listbox.delete(0, tk.END)
+        #Take only the names of the songs not the whole path then search if the name matches 
+        #with the base of a path in the songs lists
+        matches = [os.path.basename(path) for path in self.music_player.song_list if search in os.path.basename(path)]
+        #If matches show insert them into the listbox
+        if matches:
+            self.select_song_listbox.place(x = 100, y = 100)
+            for song in matches:
+                self.select_song_listbox.insert(tk.END, song)
+        else:
+            self.select_song_listbox.place_forget()
+
+    #Function that triggers when double click happens on a song in the listbox
+    def play_song(self, event):
+        #Save the directory of the song without its name
+        directory = os.path.dirname(self.music_player.song_list[0])
+        #Get the selection  from the listbox from where the cursor is
+        selected_song = self.select_song_listbox.get(self.select_song_listbox.curselection())
+        #Join the selected songs name with the directory from before to create its full path again
+        selected_song_full_path = os.path.join(directory, selected_song)
+        #Make the song play and hide the listbox
+        self.music_player.is_playing = False
+        self.music_player.current_song = selected_song_full_path
+        self.music_player.play_song()
+        self.select_song_listbox.place_forget()
+
     def close_all(self):
         self.destroy()
         self.quit()
