@@ -225,8 +225,10 @@ class GUI(tk.Toplevel):
         #Make the song play and hide the listbox
         self.music_player.is_playing = False
         self.music_player.current_song = selected_song_full_path
+        self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)] = max(self.music_player.shuffle_list) + 1
         self.music_player.play_song()
         self.select_song_listbox.place_forget()
+        self.select_song.delete(0, tk.END)
 
     def close_all(self):
         self.destroy()
