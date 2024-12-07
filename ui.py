@@ -31,6 +31,7 @@ class GUI(tk.Toplevel):
         self.update_scale()
         self.autoplay_next()
         self.update_volume()
+        self.setup_searchbar()
 
     def setup_buttons(self):
         #Load pause button
@@ -54,14 +55,15 @@ class GUI(tk.Toplevel):
                                            font = ("Arial", 11), activebackground = "black", command = self.go_back_to_playlist)
         select_playlist_button.place(x = 1750, y = 950)
 
-        select_label = Label(text = "Search for a song", font = ("Arial", 11))
-        select_label.place(x = 100, y = 60)
+    def setup_searchbar(self):
+        self.select_label = Label(self, text = "Search for a song", font = ("Arial", 11), bg = "black", fg = "white", 
+                             relief = "flat", highlightthickness = 0, bd = 0, width = 25, anchor = "nw")
+        self.select_label.place(x = 100, y = 60)
         self.select_song = Entry(self, font = ("Arial", 12))
         self.select_song.place(x = 100, y = 80)
         self.select_song_listbox = Listbox(self, font = ("Arial", 11), height = 5)
         self.select_song.bind("<KeyRelease>", self.on_keypress)
         self.select_song_listbox.bind("<Double-1>", self.play_song)
-
 
     def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
         #Load and resize the button images
@@ -225,6 +227,12 @@ class GUI(tk.Toplevel):
         #Make the song play and hide the listbox
         self.music_player.is_playing = False
         self.music_player.current_song = selected_song_full_path
+        #if the song that was searched was already played before
+        if not self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)] == 0:
+            #Add a tuple containing the value that it had on the shuffle list (an int) and the index of where that value was
+            self.music_player.searched_songs.append((self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)],
+                                                     self.music_player.shuffle_list.index(self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)])))
+        #After keeping the previous value in the list update the max and the value of the song
         self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)] = max(self.music_player.shuffle_list) + 1
         self.music_player.play_song()
         self.select_song_listbox.place_forget()

@@ -16,6 +16,7 @@ class MusicPlayer:
         self.song_length = 0
         self.first_go = True
         self.last_played_index = None
+        self.searched_songs = []
 
     def load_song(self, song_paths):
         #if no songs are found print error
@@ -110,6 +111,10 @@ class MusicPlayer:
             self.play_song()
         #if the max is not zero and it is not the first time
         else:
+            if(not max(self.shuffle_list) - 1 in self.shuffle_list):
+                if(any(max(self.shuffle_list) - 1 == value for value, _ in self.searched_songs)):
+                    index = next((i for i, tup in enumerate(self.searched_songs) if tup[0] == (max(self.shuffle_list) - 1)))
+                    self.shuffle_list[self.searched_songs[index][1]] = self.searched_songs[index][0]
             #if max is 1
             if(max(self.shuffle_list) == 1):
                 #set the max to 0

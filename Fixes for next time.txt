@@ -1,3 +1,2 @@
-3. Give the user the ability to choose a specific song to play from the loaded playlist
-    3.1 If the searched song was already in the shuffle list and got selected again it removes it from the shuffle list the first time and only keeps the second
-4. Give the user the ability to create a custom queue of songs from the loaded playlist
+4. Sometimes autoplay doesn't work and it gets stuck
+5. Give the user the ability to create a custom queue of songs from the loaded playlist
