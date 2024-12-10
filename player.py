@@ -10,13 +10,12 @@ class MusicPlayer:
         self.is_playing = False
         self.current_song = None
         self.song_list = []
-        self.shuffle_list = []
         self.current_position = 0
         self.is_paused = True
         self.song_length = 0
-        self.first_go = True
-        self.last_played_index = None
-        self.searched_songs = []
+        self.played_queue = []
+        self.counter = True
+
 
     def load_song(self, song_paths):
         #if no songs are found print error
@@ -27,13 +26,11 @@ class MusicPlayer:
         self.song_list = song_paths
         #select a random index of the song list to pick a song
         index = random.randint(0, len(self.song_list) - 1)
-        self.current_song = song_paths[index]
+        self.current_song = self.song_list[index]
+        self.played_queue.append(self.current_song)
+        print(self.played_queue)
         #get song length for time labels in ui.py
         self.set_song_length()
-        #fill the shuffle_list with as many 0 as the songs_list to handle the shuffle
-        for i in range(len(self.song_list)):
-            self.shuffle_list.append(0)
-        self.shuffle_list[index] = 1
     
     def get_metadata(self):
         #Load the current song and read its metadata and add them in a dictionary
@@ -66,78 +63,48 @@ class MusicPlayer:
             self.is_paused = True
     
     def next_song(self):
-        #pick a random index for the shuffle list
+        #pick a random index from the song list
         next_index = random.randint(0, len(self.song_list) - 1)
+        print("we are here")
         while(True):
-            #if the shuffle_list[index] is 0 load the song and play it
-            if self.shuffle_list[next_index] == 0:
+            #if no songs are in played queue or the song that is picked is not in the queue play the new random song
+            if self.played_queue:
+                print("List is not empty")
+            if  self.song_list[next_index] in self.played_queue:
+                print("Song we picked is not in the queue")
+            
+            if not self.played_queue or not self.song_list[next_index] in self.played_queue:
                 self.current_song = self.song_list[next_index]
                 self.is_playing = False
-                self.shuffle_list[next_index] = max(self.shuffle_list) + 1
+                self.played_queue.append(self.song_list[next_index])
+                print(self.played_queue)
                 self.play_song()
                 break
+            #if the song that was picked is in the queue pick a new one
             else:
-                #if it is not 0 then check if all shuffle list nodes are not zero meaning that all songs have been played
-                if all(node != 0 for node in self.shuffle_list):
-                    #if all songs have been played make shuffle list nodes all 0 again
-                    for i in range(len(self.shuffle_list)):
-                        self.shuffle_list[i] = 0
-                #if the first random index was a song that has been played pick another one
                 next_index = random.randint(0, len(self.song_list) - 1)
     
     def previous_song(self):
-        #if the max value of the shufflelist is 0 then no other song has been played 
-        if(max(self.shuffle_list) == 0):
-            #pick a random previous song if the button is pressed with no other song played before
-            prev_index = random.randint(0, len(self.shuffle_list) - 1)
+        #if the played queue is empty pick a random song
+        if not self.played_queue and self.counter:
+            prev_index = random.randint(0, len(self.song_list) - 1)
             self.current_song = self.song_list[prev_index]
             self.is_playing = False
-            self.last_played_index = prev_index
             self.play_song()
-        #if the max is 1 and it is the first time the previous button if pressed then the loaded song will have a value of 1
-        #but you still need to pick a random song because nothing has played
-        elif(self.first_go and max(self.shuffle_list) == 1):
-            #pick a random index
-            prev_index = random.randint(0, len(self.shuffle_list) - 1)
-            #make the song that had 1 as value in the shufflelist to a 0
-            self.shuffle_list[self.shuffle_list.index(max(self.shuffle_list))] = 0
-            #tell the function that the first time has passed and the same senario cannot happen again since it could only occur
-            #when the class first loads
-            self.first_go = False
+            self.counter = False
+        #if the played queue is empty and it's not the first time
+        elif not self.played_queue:
+            prev_index = random.randint(0, len(self.song_list) - 1)
             self.current_song = self.song_list[prev_index]
             self.is_playing = False
-            #keep the last song that was playing in case you need it later
-            self.last_played_index = prev_index
             self.play_song()
-        #if the max is not zero and it is not the first time
+        #if the played queue has songs
         else:
-            if(not max(self.shuffle_list) - 1 in self.shuffle_list):
-                if(any(max(self.shuffle_list) - 1 == value for value, _ in self.searched_songs)):
-                    index = next((i for i, tup in enumerate(self.searched_songs) if tup[0] == (max(self.shuffle_list) - 1)))
-                    self.shuffle_list[self.searched_songs[index][1]] = self.searched_songs[index][0]
-            #if max is 1
-            if(max(self.shuffle_list) == 1):
-                #set the max to 0
-                self.shuffle_list[self.shuffle_list.index(max(self.shuffle_list))] = 0
-                #if the last index has a value then play that song else print error
-                #this only happens when all shuffle list nodes are 0 and then press next which makes a node 1
-                #If you press previous again it shouldnt play a random song but the previous which is held in the last played
-                if(self.last_played_index is not None):
-                    prev_index = self.last_played_index
-                    self.current_song = self.song_list[prev_index]
-                    self.is_playing = False
-                    self.play_song()
-                else:
-                    print("Problem last played index is None")
-            #if the max is more than 1 then there is a queue of at least 2 songs
-            else:
-                #zero the current max which is the song that plays and play the new max
-                self.shuffle_list[self.shuffle_list.index(max(self.shuffle_list))] = 0
-                prev_index = self.shuffle_list.index(max(self.shuffle_list))
-                self.current_song = self.song_list[prev_index]
-                self.is_playing = False
-                self.play_song()
-    
+            self.played_queue.pop()
+            self.current_song = self.played_queue.pop()
+            self.is_playing = False
+            self.play_song()
+            
 
     def get_song_position(self):
         #get the current time of the song in string format

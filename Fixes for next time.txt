@@ -1,2 +1,0 @@
-4. Sometimes autoplay doesn't work and it gets stuck
-5. Give the user the ability to create a custom queue of songs from the loaded playlist

@@ -227,13 +227,9 @@ class GUI(tk.Toplevel):
         #Make the song play and hide the listbox
         self.music_player.is_playing = False
         self.music_player.current_song = selected_song_full_path
-        #if the song that was searched was already played before
-        if not self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)] == 0:
-            #Add a tuple containing the value that it had on the shuffle list (an int) and the index of where that value was
-            self.music_player.searched_songs.append((self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)],
-                                                     self.music_player.shuffle_list.index(self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)])))
-        #After keeping the previous value in the list update the max and the value of the song
-        self.music_player.shuffle_list[self.music_player.song_list.index(selected_song_full_path)] = max(self.music_player.shuffle_list) + 1
+        #Add the song to the played queue
+        self.music_player.played_queue.append(selected_song_full_path)
+        print(self.music_player.played_queue)
         self.music_player.play_song()
         self.select_song_listbox.place_forget()
         self.select_song.delete(0, tk.END)
