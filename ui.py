@@ -102,11 +102,11 @@ class GUI(tk.Toplevel):
                                  height = 10, width = 50, bd = 0, anchor = "nw")
         self.title_label.place(x = 60, y = 890, height = 30, width = 650)
 
-        self.artist_label = Label(self, text = "Artist", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
+        self.artist_label = Label(self, text = "Artist", background = "black", font = ("Arial", 10), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
         self.artist_label.place(x = 60, y = 923, height = 30, width = 650)
         
-        self.album_label = Label(self, text = "Album", background = "black", font = ("Arial", 12), fg = "gray", relief = "flat",
+        self.album_label = Label(self, text = "Album", background = "black", font = ("Arial", 10), fg = "gray", relief = "flat",
                                  height = 10, width = 50, bd = 0, anchor = "nw")
         self.album_label.place(x = 60, y = 950, height = 30, width = 650)
 
@@ -168,10 +168,10 @@ class GUI(tk.Toplevel):
         #Autoplay next song 
         current_time = self.music_player.get_song_position_sec()
         end_time = self.music_player.get_length_in_sec()
-        if current_time == end_time:
+        if end_time - current_time <= 1:
             self.music_player.next_song()
 
-        self.after(1000, self.autoplay_next)
+        self.after(500, self.autoplay_next)
     
     def show_metadata(self):
         #Show the data of each song 
@@ -229,7 +229,6 @@ class GUI(tk.Toplevel):
         self.music_player.current_song = selected_song_full_path
         #Add the song to the played queue
         self.music_player.played_queue.append(selected_song_full_path)
-        print(self.music_player.played_queue)
         self.music_player.play_song()
         self.select_song_listbox.place_forget()
         self.select_song.delete(0, tk.END)

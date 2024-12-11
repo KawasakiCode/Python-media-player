@@ -14,7 +14,8 @@ class MusicPlayer:
         self.is_paused = True
         self.song_length = 0
         self.played_queue = []
-        self.counter = True
+        self.next_pressed = False
+        self.last_played = None
 
 
     def load_song(self, song_paths):
@@ -28,7 +29,7 @@ class MusicPlayer:
         index = random.randint(0, len(self.song_list) - 1)
         self.current_song = self.song_list[index]
         self.played_queue.append(self.current_song)
-        print(self.played_queue)
+        self.next_pressed = True
         #get song length for time labels in ui.py
         self.set_song_length()
     
@@ -65,19 +66,13 @@ class MusicPlayer:
     def next_song(self):
         #pick a random index from the song list
         next_index = random.randint(0, len(self.song_list) - 1)
-        print("we are here")
+        self.next_pressed = True
         while(True):
             #if no songs are in played queue or the song that is picked is not in the queue play the new random song
-            if self.played_queue:
-                print("List is not empty")
-            if  self.song_list[next_index] in self.played_queue:
-                print("Song we picked is not in the queue")
-            
             if not self.played_queue or not self.song_list[next_index] in self.played_queue:
                 self.current_song = self.song_list[next_index]
                 self.is_playing = False
                 self.played_queue.append(self.song_list[next_index])
-                print(self.played_queue)
                 self.play_song()
                 break
             #if the song that was picked is in the queue pick a new one
@@ -86,25 +81,24 @@ class MusicPlayer:
     
     def previous_song(self):
         #if the played queue is empty pick a random song
-        if not self.played_queue and self.counter:
-            prev_index = random.randint(0, len(self.song_list) - 1)
-            self.current_song = self.song_list[prev_index]
-            self.is_playing = False
-            self.play_song()
-            self.counter = False
-        #if the played queue is empty and it's not the first time
-        elif not self.played_queue:
-            prev_index = random.randint(0, len(self.song_list) - 1)
-            self.current_song = self.song_list[prev_index]
+        if len(self.played_queue) != 0 and self.next_pressed:
+            self.played_queue.pop()
+            self.next_pressed = False            
+        if not self.played_queue:
+            if self.last_played is not None:
+                self.current_song = self.last_played
+                self.last_played = None
+            else:
+                prev_index = random.randint(0, len(self.song_list) - 1)
+                self.current_song = self.song_list[prev_index]
+                self.last_played = self.current_song
             self.is_playing = False
             self.play_song()
         #if the played queue has songs
         else:
-            self.played_queue.pop()
             self.current_song = self.played_queue.pop()
             self.is_playing = False
-            self.play_song()
-            
+            self.play_song()            
 
     def get_song_position(self):
         #get the current time of the song in string format

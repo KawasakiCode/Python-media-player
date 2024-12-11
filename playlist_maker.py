@@ -40,18 +40,18 @@ class PlaylistMaker(tk.Tk):
         if self.error_label is not None:
             self.error_label.place_forget()
         #Show new labels and entries
-        self.question_label.config(text = "Enter the paths to your playlists by separating them with comma:")
+        self.question_label.config(text = "Enter the paths to your playlists separated by comma:")
         self.question_label.place(x = 400, y = 400)
         #Paths entry
         self.pathentry = Entry(width = 30)
-        self.pathentry.place(x = 400, y = 430)
+        self.pathentry.place(x = 400, y = 425)
         #Names label
-        self.name_label = Label(text = "Enter the names of your playlists separated by coma", bd = 0, bg = "black",
+        self.name_label = Label(text = "Enter the names of your playlists separated by comma:", bd = 0, bg = "black",
                                 fg = "gray", font = ("Arial", 13), height = 1, highlightthickness = 0, relief = "flat")
         self.name_label.place(x = 400, y = 450)
         #Names entry
         self.nameentry = Entry(width = 30)
-        self.nameentry.place(x = 400, y = 480) 
+        self.nameentry.place(x = 400, y = 475) 
         #Button to handle the entries inputs
         self.reput = Label(text = "", height = 1, bd = 0, bg = "black", fg = "gray", font = ("Arial", 10))
         self.patherror = Label(text = "", height = 1, bd = 0, bg = "black", fg = "gray", font = ("Arial", 10))
