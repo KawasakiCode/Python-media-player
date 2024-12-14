@@ -4,7 +4,7 @@ from ui import GUI
 import eyed3
 from PIL import Image, ImageTk
 import io
-
+import os
 
 #inherit from tk.Tk because it is the parent window
 class PlaylistSelectUI(tk.Toplevel):
@@ -34,6 +34,7 @@ class PlaylistSelectUI(tk.Toplevel):
         X = 200
         #Create buttons with different names and lambda functions to call a different playlist each time
         self.final_images = []
+        self.path_list = self.playlistmanager.return_paths()
         for i in range(int(self.user_input)):
             button = Button(self, text = self.names[i], background = "black", activebackground = "black", 
                                   font = ("Arial", 15), highlightthickness = 0, bd = 0, fg = "white",
@@ -42,8 +43,9 @@ class PlaylistSelectUI(tk.Toplevel):
             button.place(x = 340 + i * 350, y = 500)
             self.images = []
             for j in range(4):
-                self.playlistmanager.load_directory(self.names[i])
-                audio_file = eyed3.load(self.playlistmanager.music_player.song_list[j]) #no song list but from each path needs change
+                files = os.listdir(self.path_list[i])
+                first_four_files = files[:4]
+                audio_file = eyed3.load(os.path.join(self.path_list[i], first_four_files[j])) #no song list but from each path needs change
                 if audio_file.tag.images:
                     image = audio_file.tag.images[0]
                     image_data = image.image_data

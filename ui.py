@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 from PIL import Image, ImageTk
-from player import MusicPlayer
 import io
 import os
 

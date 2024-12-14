@@ -17,8 +17,8 @@ class PlaylistManager:
             self.paths = self.path.split(",")
             #Load the list with none if user enters less than 5 playlists
             for _ in range(5 - len(self.names)):
-                self.names.append("none")
-                self.paths.append("none")
+                self.names.append(None)
+                self.paths.append(None)
         else:
             print("There was an error loading tha paths and names")
 
@@ -40,4 +40,7 @@ class PlaylistManager:
         self.music_player.load_song(self.SONGS_LIST)
         
         return self.music_player
+
+    def return_paths(self):
+        return self.paths
 
