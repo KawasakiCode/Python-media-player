@@ -17,7 +17,8 @@ class MusicPlayer:
         self.next_pressed = False
         self.first_time = True
         self.last_played = None
-        self.queue_emptied = False
+        self.queue_emptied = True
+        self.first_time = True
 
 
     def load_song(self, song_paths):
@@ -30,7 +31,6 @@ class MusicPlayer:
         #select a random index of the song list to pick a song
         index = random.randint(0, len(self.song_list) - 1)
         self.current_song = self.song_list[index]
-        self.played_queue.append(self.current_song)
         self.next_pressed = True
         #get song length for time labels in ui.py
         self.set_song_length()
@@ -82,38 +82,18 @@ class MusicPlayer:
                 next_index = random.randint(0, len(self.song_list) - 1)
     
     def previous_song(self):
-        if (self.first_time or not self.played_queue) and not self.queue_emptied:
-            if self.first_time:
-                print("First time")
-                self.played_queue.pop()
-            else:
-                print("The queue is empty")
-            self.first_time = False
+        if not self.played_queue:
             prev_index = random.randint(0, len(self.song_list) - 1)
             self.current_song = self.song_list[prev_index]
-            self.last_played = self.current_song
-            print(f"Last played is {self.last_played}")
             self.is_playing = False
-            self.play_song()
-        elif self.last_played is not None and not self.played_queue:
-            print(f"Last played is {self.last_played} and the queue is empty")
-            self.current_song = self.last_played
-            self.last_played = None
-            self.is_playing = False
-            self.queue_emptied = False
             self.play_song()
         else:
-            print("Not first time, the queue is not empty")
-            print(self.next_pressed)
-            if self.next_pressed:
-                self.played_queue.pop()
-                print("Pop the current song")
-                self.next_pressed = False
-            print("If the list still has songs in it")
-            print(self.played_queue)
-            self.current_song = self.played_queue.pop()
+            if len(self.played_queue) > 1 and self.next_pressed:
+                self.current_song = self.played_queue.pop()
+            if self.played_queue:
+                self.current_song = self.played_queue.pop()
+            self.next_pressed = False
             self.is_playing = False
-            self.queue_emptied = True
             self.play_song()    
 
     def get_song_position(self):
