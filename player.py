@@ -13,12 +13,7 @@ class MusicPlayer:
         self.current_position = 0
         self.is_paused = True
         self.song_length = 0
-        self.played_queue = []
-        self.next_pressed = False
-        self.first_time = True
-        self.last_played = None
-        self.queue_emptied = True
-        self.first_time = True
+        self.custom_queue_list = []
 
 
     def load_song(self, song_paths):
@@ -29,9 +24,10 @@ class MusicPlayer:
         #song list = the paths that got passed in the load
         self.song_list = song_paths
         #select a random index of the song list to pick a song
-        index = random.randint(0, len(self.song_list) - 1)
-        self.current_song = self.song_list[index]
-        self.next_pressed = True
+        self.create_shuffled_list()
+        #index = random.randint(0, len(self.song_list) - 1)
+        self.current_song = self.shuffled_list[self.index]
+        #self.next_pressed = True
         #get song length for time labels in ui.py
         self.set_song_length()
     
@@ -66,35 +62,31 @@ class MusicPlayer:
             self.is_paused = True
     
     def next_song(self):
-        #pick a random index from the song list
-        next_index = random.randint(0, len(self.song_list) - 1)
-        self.next_pressed = True
-        while(True):
-            #if no songs are in played queue or the song that is picked is not in the queue play the new random song
-            if not self.played_queue or not self.song_list[next_index] in self.played_queue:
-                self.current_song = self.song_list[next_index]
-                self.is_playing = False
-                self.played_queue.append(self.song_list[next_index])
-                self.play_song()
-                break
-            #if the song that was picked is in the queue pick a new one
-            else:
-                next_index = random.randint(0, len(self.song_list) - 1)
+        #if the index is at the end of the list which means the whole playlist has been played make a new shuffled queue again
+        #and start the index from 0 again (loses the previous queue)
+        if self.custom_queue_list: #list is NOT empty
+            self.current_song = self.custom_queue_list.pop(0)
+        elif self.index == len(self.shuffled_list) - 1: #if the custom queue is empty
+            self.create_shuffled_list()
+            self.current_song = self.shuffled_list[self.index]
+        #if the index is not at the end just increment it and play the next song in the queue
+        else:
+            self.index += 1
+            self.current_song = self.shuffled_list[self.index]
+        self.is_playing = False
+        self.play_song()
     
     def previous_song(self):
-        if not self.played_queue:
-            prev_index = random.randint(0, len(self.song_list) - 1)
-            self.current_song = self.song_list[prev_index]
-            self.is_playing = False
-            self.play_song()
+        #if the index is at 0 which means the user presses previous as the first button remake a new shuffled list and play
+        #the first song (like it is a random one) (can play the same song again especially in small playlists)
+        if self.index == 0:
+            self.create_shuffled_list()
+        #if the index is not at 0 just play the previous song from the queue
         else:
-            if len(self.played_queue) > 1 and self.next_pressed:
-                self.current_song = self.played_queue.pop()
-            if self.played_queue:
-                self.current_song = self.played_queue.pop()
-            self.next_pressed = False
-            self.is_playing = False
-            self.play_song()    
+            self.index -= 1
+        self.current_song = self.shuffled_list[self.index]
+        self.is_playing = False
+        self.play_song()
 
     def get_song_position(self):
         #get the current time of the song in string format
@@ -130,3 +122,8 @@ class MusicPlayer:
 
     def change_volume(self, value):
         pygame.mixer.music.set_volume(value)
+
+    def create_shuffled_list(self):
+        #create a shuffled list of the song list and start the index at 0
+        self.shuffled_list = random.sample(self.song_list, len(self.song_list))
+        self.index = 0

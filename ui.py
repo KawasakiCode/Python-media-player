@@ -30,7 +30,7 @@ class GUI(tk.Toplevel):
         self.update_scale()
         self.autoplay_next()
         self.update_volume()
-        self.setup_searchbar()
+        self.setup_searchbars()
 
     def setup_buttons(self):
         #Load pause button
@@ -54,7 +54,8 @@ class GUI(tk.Toplevel):
                                            font = ("Arial", 11), activebackground = "black", command = self.go_back_to_playlist)
         select_playlist_button.place(x = 1750, y = 950)
 
-    def setup_searchbar(self):
+    def setup_searchbars(self):
+        #song searchbar
         self.select_label = Label(self, text = "Search for a song", font = ("Arial", 11), bg = "black", fg = "white", 
                              relief = "flat", highlightthickness = 0, bd = 0, width = 25, anchor = "nw")
         self.select_label.place(x = 100, y = 60)
@@ -63,6 +64,16 @@ class GUI(tk.Toplevel):
         self.select_song_listbox = Listbox(self, font = ("Arial", 11), height = 5)
         self.select_song.bind("<KeyRelease>", self.on_keypress)
         self.select_song_listbox.bind("<Double-1>", self.play_song)
+
+        #custom queue searchbar
+        self.queue_label = Label(self, text = "Add to queue", font = ("Arial", 11), bg = "black", fg = "white", 
+                             relief = "flat", highlightthickness = 0, bd = 0, width = 25, anchor = "nw")
+        self.queue_label.place(x = 1550, y = 60)
+        self.queue_song = Entry(self, font = ("Arial", 12))
+        self.queue_song.place(x = 1550, y = 80)
+        self.queue_song_listbox = Listbox(self, font = ("Arial", 11), height = 5)
+        self.queue_song.bind("<KeyRelease>", self.on_keypress_queue)
+        self.queue_song_listbox.bind("<Double-1>", self.create_custom_queue)
 
     def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
         #Load and resize the button images
@@ -215,6 +226,22 @@ class GUI(tk.Toplevel):
         else:
             self.select_song_listbox.place_forget()
 
+    def on_keypress_queue(self, event):
+        #Get the string from the entry
+        search = self.queue_song.get().strip()
+        #Clear the listbox from previous searches
+        self.queue_song_listbox.delete(0, tk.END)
+        #Take only the names of the songs not the whole path then search if the name matches 
+        #with the base of a path in the songs lists
+        matches = [os.path.basename(path) for path in self.music_player.song_list if search in os.path.basename(path)]
+        #If matches show insert them into the listbox
+        if matches:
+            self.queue_song_listbox.place(x = 1550, y = 100)
+            for song in matches:
+                self.queue_song_listbox.insert(tk.END, song)
+        else:
+            self.queue_song_listbox.place_forget()
+
     #Function that triggers when double click happens on a song in the listbox
     def play_song(self, event):
         #Save the directory of the song without its name
@@ -227,10 +254,22 @@ class GUI(tk.Toplevel):
         self.music_player.is_playing = False
         self.music_player.current_song = selected_song_full_path
         #Add the song to the played queue
-        self.music_player.played_queue.append(selected_song_full_path)
+        #self.music_player.played_queue.append(selected_song_full_path)
         self.music_player.play_song()
         self.select_song_listbox.place_forget()
         self.select_song.delete(0, tk.END)
+
+    def create_custom_queue(self, event):
+        #Save the directory of the song without its name
+        directory = os.path.dirname(self.music_player.song_list[0])
+        #Get the selection  from the listbox from where the cursor is
+        selected_song = self.queue_song_listbox.get(self.queue_song_listbox.curselection())
+        #Join the selected songs name with the directory from before to create its full path again
+        selected_song_full_path = os.path.join(directory, selected_song)
+        #Add the song to the custom queue list and remove the listbox
+        self.music_player.custom_queue_list.append(selected_song_full_path)
+        self.queue_song_listbox.place_forget()
+        self.queue_song.delete(0, tk.END)
 
     def close_all(self):
         self.destroy()
