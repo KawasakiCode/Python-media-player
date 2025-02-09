@@ -12,8 +12,15 @@ class PlaylistSelectUI(tk.Toplevel):
         super().__init__(*args, **kwargs)
         self.playlistmanager = playlistmanager
         self.parent = parent
-        self.user_input = user_input
-        self.name = name
+        self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
+        if not os.path.exists(self.data_dir):
+            self.user_input = user_input
+        else:
+            self.user_input = len(self.playlistmanager.data_dict)
+        if name == "":
+            self.name = ",".join(self.playlistmanager.names)
+        else:
+            self.name = name
 
         #Initialize window here
         self.title("Spotify alla better")

@@ -6,17 +6,24 @@ from playlistselectui import PlaylistSelectUI
 import re
 
 class PlaylistMaker(tk.Tk):
-    def __init__(self):
+    def __init__(self, caller):
         super().__init__()
 
         self.title("Spotify alla better")
         self.state("zoomed")
         self.configure(bg = "black")
+        self.caller = caller
+        self.name = ""
+        self.path = ""
+        self.user_input = ""
 
         #Setup start labels and entry 
-        self.setup_labels()
-        self.setup_entry()
-        self.error_label = None
+        if self.caller == "file=false":
+            self.setup_labels()
+            self.setup_entry()
+            self.error_label = None
+        elif self.caller == "file=true":
+            self.add_paths(self.path, self.name)
 
     #Setup labels
     def setup_labels(self):

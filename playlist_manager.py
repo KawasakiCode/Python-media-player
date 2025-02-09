@@ -1,5 +1,6 @@
 import os
 from player import MusicPlayer
+import json
 
 class PlaylistManager:
     def __init__(self, path, name, user_input):
@@ -7,8 +8,17 @@ class PlaylistManager:
         self.path = path
         self.name = name
         self.user_input = user_input
+        self.data_dict = {}
+        self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
+        self.data_file = os.path.join(self.data_dir, "user_data.json")
 
-        self.separate_paths_names()
+        if not os.path.exists(self.data_dir):
+            self.separate_paths_names()
+            self.add_data_to_file()
+        else:
+            self.data_dict = self.load_data_from_file()
+            self.names = list(self.data_dict.keys())
+            self.paths = list(self.data_dict.values())
 
     #Correctly separate the paths and names 
     def separate_paths_names(self):
@@ -41,6 +51,29 @@ class PlaylistManager:
         
         return self.music_player
 
+    def add_data_to_file(self):
+        os.makedirs(self.data_dir)
+        if(self.name and self.path):
+            self.names = self.name.split(",")
+            self.paths = self.path.split(",")
+            #Load the list with none if user enters less than 5 playlists
+            for _ in range(5 - len(self.names)):
+                self.names.append(None)
+                self.paths.append(None)
+            for i in range(5):
+                if self.names[i] is not None:
+                    self.data_dict.update({self.names[i]: self.paths[i]})
+        else:
+            print("There was an error loading tha paths and namess")
+        with open(self.data_file, "w") as file:
+            json.dump(self.data_dict, file, indent = 4)
+
     def return_paths(self):
         return self.paths
+    
+    def load_data_from_file(self):
+        if os.path.exists(self.data_file):
+            with open(self.data_file, "r") as file:
+                return json.load(file)
+        return None
 
