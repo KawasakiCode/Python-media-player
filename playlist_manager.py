@@ -12,7 +12,7 @@ class PlaylistManager:
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
         self.data_file = os.path.join(self.data_dir, "user_data.json")
 
-        if not os.path.exists(self.data_dir):
+        if not os.path.exists(self.data_file):
             self.separate_paths_names()
             self.add_data_to_file()
         else:

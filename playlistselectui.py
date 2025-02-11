@@ -13,7 +13,8 @@ class PlaylistSelectUI(tk.Toplevel):
         self.playlistmanager = playlistmanager
         self.parent = parent
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
-        if not os.path.exists(self.data_dir):
+        self.data_file = os.path.join(self.data_dir, "user_data.json")
+        if not os.path.exists(self.data_file):
             self.user_input = user_input
         else:
             self.user_input = len(self.playlistmanager.data_dict)
