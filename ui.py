@@ -34,20 +34,20 @@ class GUI(tk.Toplevel):
 
     def setup_buttons(self):
         #Load pause button
-        original_pause = Image.open("Assets/Pause_button.png")
-        self.setup_button_image(original_pause, 33, 919, "pause", self.music_player.pause_song)
+        original_pause = Image.open("Assets/pause.png")
+        self.setup_button_image(original_pause, 36, 36, 925, "pause", self.toggle_play)
 
         #Load next button
-        original_next = Image.open("Assets/Next_song_button.png")
-        self.setup_button_image(original_next, 30, 920, "next", self.music_player.next_song)
+        original_next = Image.open("Assets/next.png")
+        self.setup_button_image(original_next, 30, 30, 928, "next", self.music_player.next_song)
 
         #Load previous button
-        original_previous = Image.open("Assets/Previous_song_button.png")
-        self.setup_button_image(original_previous, 30, 920, "previous", self.music_player.previous_song)
+        original_previous = Image.open("Assets/previous.png")
+        self.setup_button_image(original_previous, 30, 30, 928, "previous", self.music_player.previous_song)
 
         #Load play button
-        original_play = Image.open("Assets/play_button.png")
-        self.setup_button_image(original_play, 50, 908, "play", self.music_player.play_song)
+        original_play = Image.open("Assets/play.png")
+        self.setup_button_image(original_play, 36, 36, 925, "play", self.toggle_pause)
 
         select_playlist_button = tk.Button(self, text = "Change Playlist?", bd = 0, cursor = "hand2", borderwidth = 0,
                                            highlightthickness = 0, relief = "flat", background = "black", fg = "white", 
@@ -75,27 +75,31 @@ class GUI(tk.Toplevel):
         self.queue_song.bind("<KeyRelease>", self.on_keypress_queue)
         self.queue_song_listbox.bind("<Double-1>", self.create_custom_queue)
 
-    def setup_button_image(self, original_image, target_width, y_pos, button_name, command):
-        #Load and resize the button images
-        aspect_ratio = original_image.width / original_image.height
-        new_width = target_width
-        new_height = int(new_width / aspect_ratio)
-        resized_image = original_image.resize((new_width, new_height), Image.LANCZOS)
+    def setup_button_image(self, original_image, width, height, y_pos, button_name, command):
+        resized_image = original_image.resize((width, height), Image.LANCZOS)
         button_image = ImageTk.PhotoImage(resized_image)
 
-        button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
-                        relief="flat", activebackground="black", command=command)
-        #keep the image as an attribute so python garbage collector won't delete it
-        button.image = button_image
-        if button_name == "pause":
-            button.place(x=970, y=y_pos)
-        elif button_name == "next":
-            button.place(x=1020, y=y_pos)
+        if button_name == "play":
+            self.play_button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
+                        relief="flat", activebackground="black", bg = "black", command=command)
+            #keep the image as an attribute so python garbage collector won't delete it
+            self.play_button.image = button_image
+            self.play_button.place(x=945, y=y_pos)
+        elif button_name == "pause":
+            self.pause_button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
+                        relief="flat", activebackground="black", bg = "black", command=command)
+            self.pause_button.image = button_image
         elif button_name == "previous":
-            button.place(x=870, y=y_pos)
-        elif button_name == "play":
-            button.place(x=905, y=y_pos)
-
+            self.previous_button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
+                        relief="flat", activebackground="black", bg = "black", command=command)
+            self.previous_button.image = button_image
+            self.previous_button.place(x=892, y=y_pos)  
+        elif button_name == "next":
+            self.next_button = tk.Button(self, bd=0, cursor="hand2", image=button_image, borderwidth=0, highlightthickness=0,
+                        relief="flat", activebackground="black", bg = "black", command=command)
+            self.next_button.image = button_image
+            self.next_button.place(x=1004, y=y_pos)
+               
     def setup_labels(self):
         # Label to show the song time
         self.time_label = Label(self, text="0:00", background="black", height=10, width=25, bd=0,
@@ -135,12 +139,11 @@ class GUI(tk.Toplevel):
         self.volume_label = Label(self, image = self.volume_image, relief = "flat", bd = 0, background = "black")
         self.volume_label.place(x = 1400, y = 976)
 
-
     def setup_slider(self):
         # Slider to control song position
         START = 0
         end = self.music_player.get_length_in_sec()
-        self.length_slider = ttk.Scale(self, from_=START, to=end, orient="horizontal", length=655)
+        self.length_slider = ttk.Scale(self, from_=START, to=end, orient="horizontal", length=656)
         self.length_slider.place(x=635, y=977)
 
         self.volume_slider = ttk.Scale(self, from_ = 0, to = 100, orient = "horizontal", length = 200)
@@ -172,7 +175,6 @@ class GUI(tk.Toplevel):
         self.music_player.change_volume(volume)
 
         self.after(500, self.update_volume)
-
 
     def autoplay_next(self):
         #Autoplay next song 
@@ -209,8 +211,8 @@ class GUI(tk.Toplevel):
         self.music_player.is_playing = False
         self.parent.deiconify()
 
-    #Function that triggers when a character is inserted into the search entry
     def on_keypress(self, event):
+        #Function that triggers when a character is inserted into the search entry
         #Get the string from the entry
         search = self.select_song.get().strip()
         #Clear the listbox from previous searches
@@ -241,9 +243,9 @@ class GUI(tk.Toplevel):
                 self.queue_song_listbox.insert(tk.END, song)
         else:
             self.queue_song_listbox.place_forget()
-
-    #Function that triggers when double click happens on a song in the listbox
+  
     def play_song(self, event):
+        #Function that triggers when double click happens on a song in the listbox
         #Save the directory of the song without its name
         directory = os.path.dirname(self.music_player.song_list[0])
         #Get the selection  from the listbox from where the cursor is
@@ -274,3 +276,15 @@ class GUI(tk.Toplevel):
     def close_all(self):
         self.destroy()
         self.quit()
+
+    def toggle_pause(self):
+        #when play is pressed
+        self.play_button.place_forget()
+        self.pause_button.place(x = 945, y = 925)
+        self.music_player.play_song()
+    
+    def toggle_play(self):
+        #when paused is pressed
+        self.pause_button.place_forget()
+        self.play_button.place(x = 945, y = 925)
+        self.music_player.pause_song()
