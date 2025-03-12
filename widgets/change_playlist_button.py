@@ -5,8 +5,6 @@ class Change_playlist(QPushButton):
     def __init__(self, parent):
         super().__init__(parent)
         self.setFixedSize(120, 40)
-        self.pressed_offset_x = 0
-        self.pressed_offset_y = 0
         self.setText("Change Playlist?")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setStyleSheet("""

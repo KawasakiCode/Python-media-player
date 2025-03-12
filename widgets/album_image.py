@@ -10,7 +10,7 @@ class AlbumImage(QWidget):
         self.image_label = QLabel(self)
         self.image_label.setFixedSize(300, 300)
 
-        pixmap = QPixmap("..\\Assets\\default.jpg")
+        pixmap = QPixmap("Assets/default.jpg")
 
         self.image_label.setPixmap(pixmap)
         self.image_label.setScaledContents(True)

@@ -5,8 +5,11 @@ from PySide6.QtGui import QPainter, QPainterPath, QBrush
 from widgets.playlist_covers import PlaylistCover
 from widgets.name_button import NameButton
 from widgets.select_image_button import SelectImageButton
+from widgets.add_remove_playlist import AddRemovePlaylist
 from main_ui import MainUi
-
+from add_remove_ui import AddRemoveUi
+import json
+import os
 
 class PlaylistSelectUi(QMainWindow):
     def __init__(self, playlist_dict):
@@ -17,6 +20,13 @@ class PlaylistSelectUi(QMainWindow):
         self.playlist_covers = []
         self.name_buttons = []
         self.select_image_buttons = []
+        self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
+        self.data_file = os.path.join(self.data_dir, "user_data.json")
+
+        self.add_remove_buttons = AddRemovePlaylist(self)
+        self.add_remove_buttons.move(1700, 850)
+        self.add_remove_buttons.add_playlist.clicked.connect(self.add_playlist)
+        self.add_remove_buttons.remove_playlist.clicked.connect(self.remove_playlist)
 
         x = 225
         y = 130
@@ -73,3 +83,56 @@ class PlaylistSelectUi(QMainWindow):
         painter.end()
 
         return rounded
+
+    def add_playlist(self):
+        self.hide()
+        self.addremoveui = AddRemoveUi(self, "add")
+
+    def remove_playlist(self):
+        self.hide()
+        self.addremoveui = AddRemoveUi(self, "remove")
+    
+    def refresh_playlists(self):
+        try:
+            with open(self.data_file, "r") as file:
+                data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {}
+
+        self.playlist_dict = data  # Update the playlist dictionary
+
+        # Clear the existing buttons and covers
+        for widget in self.playlist_covers + self.name_buttons + self.select_image_buttons:
+            widget.deleteLater()
+
+        # Re-create UI elements with the updated playlist dictionary
+        self.playlist_covers = []
+        self.name_buttons = []
+        self.select_image_buttons = []
+
+        x = 225
+        y = 130
+        for i in range(len(self.playlist_dict)):
+            playlist_cover = PlaylistCover(self)
+            playlist_cover.move(x, y)
+            self.playlist_covers.append(playlist_cover)
+
+            for index, (key, value) in enumerate(self.playlist_dict.items()):
+                if index == i:
+                    self.key = key
+                    break
+
+            select_image_button = SelectImageButton(self)
+            self.select_image_buttons.append(select_image_button)
+            select_image_button.clicked.connect(lambda checked, idx=i: self.open_file_dialog(idx))
+            select_image_button.move(x + 8, y + 50)
+
+            name_button = NameButton(self)
+            name_button.setText(f"{self.key}")
+            name_button.move(x + 60, y + 320)
+            self.name_buttons.append(name_button)
+            x += 300
+            if i == 4:
+                x = 225
+                y += 400
+            name_button.clicked.connect(lambda checked, name=self.key: self.open_main_ui(name))

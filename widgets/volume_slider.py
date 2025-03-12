@@ -22,7 +22,7 @@ class VolumeSlider(QWidget):
         self.update_stylesheet(False)
 
         self.image_label = QLabel()
-        pixmap = QPixmap("../Assets/volume_half.png")
+        pixmap = QPixmap("Assets/volume_half.png")
         scaled_pixmap = pixmap.scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Scale image
         self.image_label.setPixmap(scaled_pixmap)
         self.image_label.setFixedSize(25, 25)
@@ -65,17 +65,16 @@ class VolumeSlider(QWidget):
 
     def slider_value_changed(self, value):
         if value == 0:
-            pixmap = QPixmap("../Assets/volume_mute.png")
+            pixmap = QPixmap("Assets/volume_mute.png")
         elif value < 25:
-            pixmap = QPixmap("../Assets/volume_one.png")
+            pixmap = QPixmap("Assets/volume_one.png")
         elif value < 75:
-            pixmap = QPixmap("../Assets/volume_half.png")
+            pixmap = QPixmap("Assets/volume_half.png")
         else:
-            pixmap = QPixmap("../Assets/volume_max.png")
+            pixmap = QPixmap("Assets/volume_max.png")
         
-        # Check if the pixmap is successfully loaded
         if pixmap.isNull():
-            print("Error: Failed to load image")  # Print error message for debugging
+            print("Error: Failed to load image")
         else:
             scaled_pixmap = pixmap.scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.image_label.setPixmap(scaled_pixmap)

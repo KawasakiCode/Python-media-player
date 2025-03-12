@@ -12,7 +12,7 @@ class PlaylistCover(QWidget):
         self.image_label.setFixedSize(250, 250)
 
         # Load and apply rounded image with subtle corners
-        self.image_label.setPixmap(self.get_rounded_pixmap("../Assets/default.jpg", 35))
+        self.image_label.setPixmap(self.get_rounded_pixmap("Assets/default.jpg", 35))
         self.image_label.setScaledContents(True)
 
         layout.addWidget(self.image_label)
