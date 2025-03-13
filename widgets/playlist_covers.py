@@ -3,16 +3,19 @@ from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QBrush
 from PySide6.QtCore import Qt
 
 class PlaylistCover(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent, image_path):
         super().__init__(parent)
 
         layout = QVBoxLayout()
 
         self.image_label = QLabel(self)
         self.image_label.setFixedSize(250, 250)
+        self.image_path = image_path
 
-        # Load and apply rounded image with subtle corners
-        self.image_label.setPixmap(self.get_rounded_pixmap("Assets/default.jpg", 35))
+        if image_path == "default":
+            self.image_label.setPixmap(self.get_rounded_pixmap("Assets/default.jpg", 35))
+        else:
+            self.image_label.setPixmap(self.get_rounded_pixmap(image_path, 35))
         self.image_label.setScaledContents(True)
 
         layout.addWidget(self.image_label)

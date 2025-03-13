@@ -22,6 +22,10 @@ class PlaylistSelectUi(QMainWindow):
         self.select_image_buttons = []
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
         self.data_file = os.path.join(self.data_dir, "user_data.json")
+        self.image_data_file = os.path.join(self.data_dir, "image_data.json")
+        if self.ensure_file_exists():
+            with open(self.image_data_file, "r") as file:
+                self.image_data_dict = json.load(file)          
 
         self.add_remove_buttons = AddRemovePlaylist(self)
         self.add_remove_buttons.move(1700, 850)
@@ -31,9 +35,13 @@ class PlaylistSelectUi(QMainWindow):
         x = 225
         y = 130
         for i in range(len(self.playlist_dict)):
-            playlist_cover = PlaylistCover(self)
+            if self.ensure_file_exists() and (str(i) in self.image_data_dict):
+                playlist_cover = PlaylistCover(self, self.image_data_dict[str(i)])
+                self.playlist_covers.append(playlist_cover)
+            else:
+                playlist_cover = PlaylistCover(self, "default")
+                self.playlist_covers.append(playlist_cover)
             playlist_cover.move(x, y)
-            self.playlist_covers.append(playlist_cover)
 
             for index, (key, value) in enumerate(self.playlist_dict.items()):
                 if index == i:
@@ -63,7 +71,7 @@ class PlaylistSelectUi(QMainWindow):
     
     def open_file_dialog(self, idx):
         file_path, _ = QFileDialog.getOpenFileName(self, "Select an Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
-
+        self.add_data_to_file(file_path, idx)
         if file_path:
             pixmap = self.get_rounded_pixmap(file_path, 35)
             self.playlist_covers[idx].image_label.setPixmap(pixmap.scaled(300, 300, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
@@ -98,14 +106,15 @@ class PlaylistSelectUi(QMainWindow):
                 data = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             data = {}
+        if self.ensure_file_exists():
+            with open(self.image_data_file, "r") as file:
+                self.image_data_dict = json.load(file)
 
-        self.playlist_dict = data  # Update the playlist dictionary
+        self.playlist_dict = data
 
-        # Clear the existing buttons and covers
         for widget in self.playlist_covers + self.name_buttons + self.select_image_buttons:
             widget.deleteLater()
 
-        # Re-create UI elements with the updated playlist dictionary
         self.playlist_covers = []
         self.name_buttons = []
         self.select_image_buttons = []
@@ -113,9 +122,13 @@ class PlaylistSelectUi(QMainWindow):
         x = 225
         y = 130
         for i in range(len(self.playlist_dict)):
-            playlist_cover = PlaylistCover(self)
+            if self.ensure_file_exists() and (str(i) in self.image_data_dict):
+                playlist_cover = PlaylistCover(self, self.image_data_dict[str(i)])
+                self.playlist_covers.append(playlist_cover)
+            else:
+                playlist_cover = PlaylistCover(self, "default")
+                self.playlist_covers.append(playlist_cover)
             playlist_cover.move(x, y)
-            self.playlist_covers.append(playlist_cover)
 
             for index, (key, value) in enumerate(self.playlist_dict.items()):
                 if index == i:
@@ -136,3 +149,19 @@ class PlaylistSelectUi(QMainWindow):
                 x = 225
                 y += 400
             name_button.clicked.connect(lambda checked, name=self.key: self.open_main_ui(name))
+    
+    def add_data_to_file(self, data, index):
+        if self.ensure_file_exists():
+            with open(self.image_data_file, "r") as file:
+                data_dict = json.load(file)
+            data_dict[index] = data
+            with open(self.image_data_file, "w") as file:
+                json.dump(data_dict, file, indent = 4)
+        else:
+            data_dict = {}
+            data_dict[index] = data
+            with open(self.image_data_file, "w") as file:
+                json.dump(data_dict, file, indent = 4)
+    
+    def ensure_file_exists(self):
+        return os.path.exists(self.data_file)
