@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPainterPath, QBrush
 from widgets.playlist_covers import PlaylistCover
@@ -15,14 +15,19 @@ class PlaylistSelectUi(QMainWindow):
     def __init__(self, playlist_dict):
         super().__init__()
         self.playlist_dict = playlist_dict
+
         self.setWindowTitle("Spotify alla better")
         self.setStyleSheet("background: black;")
+        self.setWindowIcon(QIcon("Assets/icon.ico"))
+
         self.playlist_covers = []
         self.name_buttons = []
         self.select_image_buttons = []
+        
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
         self.data_file = os.path.join(self.data_dir, "user_data.json")
         self.image_data_file = os.path.join(self.data_dir, "image_data.json")
+        
         if self.ensure_file_exists():
             with open(self.image_data_file, "r") as file:
                 self.image_data_dict = json.load(file)          
@@ -164,4 +169,4 @@ class PlaylistSelectUi(QMainWindow):
                 json.dump(data_dict, file, indent = 4)
     
     def ensure_file_exists(self):
-        return os.path.exists(self.data_file)
+        return os.path.exists(self.image_data_file)

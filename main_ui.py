@@ -13,7 +13,7 @@ from widgets.album_image import AlbumImage
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainter, QPainterPath, QBrush
+from PySide6.QtGui import QPainter, QPainterPath, QBrush, QIcon
 from PIL import Image
 import os
 import sys
@@ -29,6 +29,8 @@ class MainUi(QMainWindow):
         super().__init__()
         self.setWindowTitle("Spotify alla batter")
         self.setStyleSheet("background: black;")
+        self.setWindowIcon(QIcon("Assets/icon.ico"))
+
         self.playlist_select_ui = playlist_select_ui
         self.playlist_name = playlist_name
         self.playlist_path = self.playlist_select_ui.playlist_dict[self.playlist_name]

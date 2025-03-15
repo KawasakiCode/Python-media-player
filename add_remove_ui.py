@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QLabel, QLineEdit
+from PySide6.QtGui import QIcon
 from widgets.back_button import BackButton
 import os
 import json
@@ -11,6 +12,7 @@ class AddRemoveUi(QMainWindow):
 
         self.setWindowTitle("Spotify alla better")
         self.setStyleSheet("background: black;")
+        self.setWindowIcon(QIcon("Assets/icon.ico"))
 
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
         self.data_file = os.path.join(self.data_dir, "user_data.json")
