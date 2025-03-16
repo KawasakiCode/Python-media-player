@@ -107,13 +107,18 @@ class PlaylistSelectUi(QMainWindow):
     
     def refresh_playlists(self):
         try:
-            with open(self.data_file, "r") as file:
-                data = json.load(file)
+            if not os.path.getsize(self.data_file) == 0:
+                with open(self.data_file, "r") as file:
+                    data = json.load(file)
+            else:
+                data = {}
         except (FileNotFoundError, json.JSONDecodeError):
             data = {}
-        if self.ensure_file_exists():
+        if self.ensure_file_exists() and not os.path.getsize(self.image_data_file) == 0:
             with open(self.image_data_file, "r") as file:
                 self.image_data_dict = json.load(file)
+        else:
+            self.image_data_dict = {}
 
         self.playlist_dict = data
 
@@ -156,7 +161,7 @@ class PlaylistSelectUi(QMainWindow):
             name_button.clicked.connect(lambda checked, name=self.key: self.open_main_ui(name))
     
     def add_data_to_file(self, data, index):
-        if self.ensure_file_exists():
+        if self.ensure_file_exists() and not os.path.getsize(self.image_data_file) == 0:
             with open(self.image_data_file, "r") as file:
                 data_dict = json.load(file)
             data_dict[index] = data

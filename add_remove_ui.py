@@ -147,8 +147,11 @@ class AddRemoveUi(QMainWindow):
     def create_playlist(self, path, name):
         if self.is_audio_directory(path):
             try:
-                with open(self.data_file, "r") as file:
-                    data = json.load(file)
+                if not os.path.getsize(self.data_file) == 0:
+                    with open(self.data_file, "r") as file:
+                        data = json.load(file)
+                else:
+                    data = {}
             except FileNotFoundError:
                 data = {}
             if len(data) == 10:
@@ -176,8 +179,11 @@ class AddRemoveUi(QMainWindow):
     
     def remove_playlist(self, name):
         try:
-            with open(self.data_file, "r") as file:
-                data = json.load(file)
+            if not os.path.getsize(self.data_file) == 0:
+                with open(self.data_file, "r") as file:
+                    data = json.load(file)
+            else:
+                data = {}
         except (FileNotFoundError, json.JSONDecodeError):
             data = {}
         self.iteration = 0
@@ -185,12 +191,19 @@ class AddRemoveUi(QMainWindow):
             self.errorlabel.setText("You can't delete all playlists")
             self.errorlabel.show()
             return False
+        elif len(data) == 0:
+            self.errorlabel.setText("There was a file error")
+            self.errorlabel.show()
+            return False
         for i, (key, value) in enumerate(data.items()):
             if key == name:
                 self.iteration = i
         
-        with open(self.image_data_file, "r") as file:
-            image_data = json.load(file)
+        if not os.path.getsize(self.image_data_file) == 0:
+            with open(self.image_data_file, "r") as file:
+                image_data = json.load(file)
+        else:
+            image_data = {}
         if str(self.iteration) in image_data:
             del image_data[str(self.iteration)]
             with open(self.image_data_file, "w") as file:
@@ -221,10 +234,8 @@ class AddRemoveUi(QMainWindow):
             return all(file.lower().endswith(tuple(audio_extensions)) for file in files if os.path.isfile(os.path.join(directory, file)))
 
         except FileNotFoundError:
-            print("Directory not found.")
             return False
         except PermissionError:
-            print("Permission denied.")
             return False
 
             

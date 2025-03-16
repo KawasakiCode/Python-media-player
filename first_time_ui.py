@@ -169,6 +169,7 @@ class FirstTimeUi(QMainWindow):
         return playlist_dict
 
     def add_data_to_file(self, data_dict):
-        os.makedirs(self.data_dir)
+        if not os.path.isdir(self.data_dir):
+            os.makedirs(self.data_dir)
         with open(self.data_file, "w") as file:
             json.dump(data_dict, file, indent = 4)
