@@ -12,12 +12,18 @@ data_file = os.path.join(data_dir, "user_data.json")
 def ensure_data_directory():
     return os.path.exists(data_file)
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    QGuiApplication.setWindowIcon(QIcon("Assets/icon.ico"))
+    QGuiApplication.setWindowIcon(QIcon(resource_path("Assets/icon.ico")))
     if ensure_data_directory() and not os.path.getsize(data_file) == 0:
-        print("here")
         with open(data_file, "r") as file:
             file_dir = json.load(file)
         window = PlaylistSelectUi(file_dir)

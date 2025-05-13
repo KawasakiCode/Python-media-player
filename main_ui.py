@@ -29,7 +29,7 @@ class MainUi(QMainWindow):
         super().__init__()
         self.setWindowTitle("Spotify alla batter")
         self.setStyleSheet("background: black;")
-        self.setWindowIcon(QIcon("Assets/icon.ico"))
+        self.setWindowIcon(QIcon(self.resource_path("Assets/icon.ico")))
 
         self.playlist_select_ui = playlist_select_ui
         self.playlist_name = playlist_name
@@ -73,7 +73,15 @@ class MainUi(QMainWindow):
 
 
         self.showMaximized()
+    
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
         
+        return os.path.join(base_path, relative_path)
+
     def showEvent(self, event):
         super().showEvent(event)
         self.rewind_button.move(887, 941)

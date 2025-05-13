@@ -10,6 +10,7 @@ from main_ui import MainUi
 from add_remove_ui import AddRemoveUi
 import json
 import os
+import sys
 
 class PlaylistSelectUi(QMainWindow):
     def __init__(self, playlist_dict):
@@ -18,7 +19,7 @@ class PlaylistSelectUi(QMainWindow):
 
         self.setWindowTitle("Spotify alla better")
         self.setStyleSheet("background: black;")
-        self.setWindowIcon(QIcon("Assets/icon.ico"))
+        self.setWindowIcon(QIcon(self.resource_path("Assets/icon.ico")))
 
         self.playlist_covers = []
         self.name_buttons = []
@@ -69,6 +70,14 @@ class PlaylistSelectUi(QMainWindow):
             name_button.clicked.connect(lambda checked, name = self.key: self.open_main_ui(name))
         self.showMaximized()
     
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        
+        return os.path.join(base_path, relative_path)
+
     def open_main_ui(self, name):
         self.hide()
         self.main_ui = MainUi(self, name)

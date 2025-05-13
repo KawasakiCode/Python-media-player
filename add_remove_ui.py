@@ -3,6 +3,7 @@ from PySide6.QtGui import QIcon
 from widgets.back_button import BackButton
 import os
 import json
+import sys
 
 class AddRemoveUi(QMainWindow):
     def __init__(self, playlist_select_ui, caller):
@@ -12,7 +13,7 @@ class AddRemoveUi(QMainWindow):
 
         self.setWindowTitle("Spotify alla better")
         self.setStyleSheet("background: black;")
-        self.setWindowIcon(QIcon("Assets/icon.ico"))
+        self.setWindowIcon(QIcon(self.resource_path("Assets/icon.ico")))
 
         self.data_dir = os.path.join(os.path.expanduser("~"), ".spotify_alla_better")
         self.data_file = os.path.join(self.data_dir, "user_data.json")
@@ -104,6 +105,14 @@ class AddRemoveUi(QMainWindow):
 
         self.showMaximized()
     
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        
+        return os.path.join(base_path, relative_path)
+
     def process_input(self):
         self.errorlabel.hide()
         if self.caller == "add":

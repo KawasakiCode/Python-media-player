@@ -1,10 +1,9 @@
 from PySide6.QtWidgets import QSlider, QWidget, QHBoxLayout, QLabel
-from PySide6.QtCore import Qt, QEvent, QTimer
+from PySide6.QtCore import Qt, QEvent
 
 class Widget(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setWindowTitle("Wow window")
 
         layout = QHBoxLayout()
         self.slider = QSlider(Qt.Horizontal)

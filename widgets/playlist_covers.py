@@ -1,6 +1,8 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QBrush
 from PySide6.QtCore import Qt
+import sys
+import os
 
 class PlaylistCover(QWidget):
     def __init__(self, parent, image_path):
@@ -13,7 +15,7 @@ class PlaylistCover(QWidget):
         self.image_path = image_path
 
         if image_path == "default":
-            self.image_label.setPixmap(self.get_rounded_pixmap("Assets/default.jpg", 35))
+            self.image_label.setPixmap(self.get_rounded_pixmap(self.resource_path("Assets/default.jpg"), 35))
         else:
             self.image_label.setPixmap(self.get_rounded_pixmap(image_path, 35))
         self.image_label.setScaledContents(True)
@@ -42,3 +44,11 @@ class PlaylistCover(QWidget):
         painter.end()
 
         return rounded
+
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        
+        return os.path.join(base_path, relative_path)

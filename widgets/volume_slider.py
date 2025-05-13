@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QSlider, QWidget, QHBoxLayout, QLabel
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QPixmap
+import sys
+import os
 
 class VolumeSlider(QWidget):
     def __init__(self, parent):
@@ -65,16 +67,24 @@ class VolumeSlider(QWidget):
 
     def slider_value_changed(self, value):
         if value == 0:
-            pixmap = QPixmap("Assets/volume_mute.png")
+            pixmap = QPixmap(self.resource_path("Assets/volume_mute.png"))
         elif value < 25:
-            pixmap = QPixmap("Assets/volume_one.png")
+            pixmap = QPixmap(self.resource_path("Assets/volume_one.png"))
         elif value < 75:
-            pixmap = QPixmap("Assets/volume_half.png")
+            pixmap = QPixmap(self.resource_path("Assets/volume_half.png"))
         else:
-            pixmap = QPixmap("Assets/volume_max.png")
+            pixmap = QPixmap(self.resource_path("Assets/volume_max.png"))
         
         if pixmap.isNull():
             print("Error: Failed to load image")
         else:
             scaled_pixmap = pixmap.scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.image_label.setPixmap(scaled_pixmap)
+        
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        
+        return os.path.join(base_path, relative_path)
