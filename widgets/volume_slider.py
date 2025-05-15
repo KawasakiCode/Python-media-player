@@ -7,7 +7,6 @@ import os
 class VolumeSlider(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setWindowTitle("Wow window")
 
         layout = QHBoxLayout()
 
@@ -24,7 +23,7 @@ class VolumeSlider(QWidget):
         self.update_stylesheet(False)
 
         self.image_label = QLabel()
-        pixmap = QPixmap("Assets/volume_half.png")
+        pixmap = QPixmap(self.resource_path("Assets/volume_half.png"))
         scaled_pixmap = pixmap.scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Scale image
         self.image_label.setPixmap(scaled_pixmap)
         self.image_label.setFixedSize(25, 25)
